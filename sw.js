@@ -6,12 +6,12 @@
 
 const cacheName = "hexrgb-v1";
 const swfiles = [
-  "/",
-  "/index.html",
-  "/app.js",
-  "/style.css",
-  "/favicon.ico",
-  "/icon/icon512.png"
+  "/hexrgb/",
+  "/hexrgb/index.html",
+  "/hexrgb/app.js",
+  "/hexrgb/style.css",
+  "/hexrgb/favicon.ico",
+  "/hexrgb/icon/icon512.png"
 ];
 
 const contentToCache = swfiles;
