@@ -1,0 +1,53 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title></title>
+  <link rel="stylesheet" href="/style.css"/>
+  <link rel="manifest" href="manifest.json"/>
+</head>
+<body>
+<div id="wrap">
+<input tabindex="1" type="text" maxlength="3" id="rbox"><input tabindex="-1" type="range" id="r" min="0" step="1" max="255"><br/>
+<input tabindex="2" type="text" maxlength="3" id="gbox"><input tabindex="-1" type="range" id="g" min="0" step="1" max="255"><br/>
+<input tabindex="3" type="text" maxlength="3" id="bbox"><input tabindex="-1" type="range" id="b" min="0" step="1" max="255"><br/>
+<div id="hexwrap"><span>#</span><span maxlength="6" id="hexpad"></span><div id="colorpanel"><input tabindex="4" id="colorpicker" type="color"></div></div>
+</div>
+
+<div id="footer">motet-hexrgb v0.3 &middot; MOTET PAPER &copy; 2025 &middot; <button id="exportbtn" tabindex="5" popovertarget="exporters">export</button> &middot; <button tabindex="6" popovertarget="settings">settings</button></div>
+
+
+<div id="settings" class="popover" popover>
+  <h4>Settings<hr></h4>
+
+  No settings. Check back soon.
+  <p>
+    <button tabindex="-1" popovertarget="settings">OK</button>
+  </p>
+</div>
+
+<div id="exporters" class="popover" popover>
+  <h4>Export<hr></h4>
+
+  <button id="export-favicon">favicon <u>🠋</u></button>
+  <br/><br/>
+  <button id="export-icon">square icon (1024px) <u>🠋</u></button>
+  <br/><br/>
+  <button id="export-photocard">4R Photo Card (4x6) <u>🠋</u></button>
+  <br/><br/>
+  <button id="export-wallpaper">Desktop Wallpaper <u>🠋</u></button>
+  <br/><br/>
+  <button id="export-wallpaper-notext">Desktop Wallpaper <u>🠋</u></button> (no text)
+
+  <br/>
+  <br/>
+  <hr>
+  <p>
+    <button tabindex="-1" popovertarget="exporters">done</button>
+  </p>
+</div>
+
+<script defer src="/app.js"></script>
+</body>
+</html>

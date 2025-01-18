@@ -1,0 +1,91 @@
+body {
+  margin: 0;
+  font-family: monospace;
+  margin-top: 25px;
+}
+
+a {
+  color: white;
+}
+
+a:hover {
+  color: yellow;
+}
+
+/* RGB color sliders */
+input[type="range"] {
+  width: 99%;
+  padding-top: 25px;
+  padding-bottom: 25px;
+}
+
+/* RGB text fields */
+input[type="text"] {
+  width: 100px;
+  font-weight: bold;
+  color: black;
+  border: 0;
+  font-size: 35pt;
+  font-family: monospace;
+}
+
+/* built-in color picker */
+input[type="color"] {
+  height: 80px;
+  width: 350px;
+  opacity: 0;
+}
+
+button {
+  cursor: pointer;
+}
+
+#hexwrap span {
+  font-size: 50pt;
+  font-weight: bold;
+  color: black;
+}
+
+#wrap {
+  margin-left: 80px;
+  margin-right: 80px;
+}
+
+#footer {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  font-size: 10pt;
+  font-weight: 900;
+  margin-right: 16px;
+  margin-bottom: 16px;
+}
+
+#betabtn {
+  border: 0;
+  background-color: rgba(0,0,0,0);
+}
+
+.popover {
+  z: 100;
+  width: 500px;
+  height: 300px;
+  font-size: 15pt;
+  padding: 25px;
+  border: 200px solid rgba(0,0,0,0.5);
+}
+#settings {
+  z: 100;
+}
+
+#exporters {
+  z: 99;
+  height: 450px;
+}
+
+
+#colorpanel {
+  position: relative;
+  z:88;
+  top: -80px;
+}
