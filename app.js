@@ -4,7 +4,7 @@
 // lic    : MIT
 
 if ("serviceWorker" in navigator) {
-  navigator.serviceWorker.register('/sw.js');
+  navigator.serviceWorker.register('./sw.js');
 }
 
 const thepage = document.body;
