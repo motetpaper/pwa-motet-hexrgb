@@ -41,10 +41,10 @@ document.addEventListener('DOMContentLoaded', (evt)=>{
           motet_export_photo_4r();
           break;
         case 'export-wallpaper-notext':
-          motet_export_desktop_wallpaper(true);
+          motet_export_desktop_wallpaper();
           break;
         case 'export-wallpaper':
-          motet_export_desktop_wallpaper();
+          motet_export_desktop_wallpaper(true);
           break;
         default:
           // nothing
