@@ -32,19 +32,19 @@ document.addEventListener('DOMContentLoaded', (evt)=>{
     a.addEventListener('click', (evt)=>{
       switch(evt.target.id){
         case 'export-favicon':
-          foo_export_favicon();
+          motet_export_favicon();
           break;
         case 'export-icon':
-          foo_export_png_icon();
+          motet_export_png_icon();
           break;
         case 'export-photocard':
-          foo_export_photo_4r();
+          motet_export_photo_4r();
           break;
         case 'export-wallpaper-notext':
-          foo_export_desktop_wallpaper(true);
+          motet_export_desktop_wallpaper(true);
           break;
         case 'export-wallpaper':
-          foo_export_desktop_wallpaper();
+          motet_export_desktop_wallpaper();
           break;
         default:
           // nothing
