@@ -279,23 +279,43 @@ function motet_export_photo_4r() {
 
 
 function motet_export_desktop_wallpaper(showText) {
-  const woffset = 800;
   const canvas = document.createElement('canvas');
   canvas.width = w = window.screen.width;
   canvas.height = h = window.screen.height;
+
+  const woffset = Math.floor(0.1 * w);
   const ctx = canvas.getContext('2d');
   const hex = asHexString();
   const fn = `desktop-wallpaper-${hex}.png`;
   ctx.fillStyle = `#${hex}`;
   ctx.fillRect(0,0,w,h);
+
+  txt = {};
   if(showText) {
+
+    txt.fp1 = 144,
+    txt.fp2 = 72,
+    txt.fp3 = 36,
+    txt.fh1 = 275,
+    txt.fh2 = 175,
+    txt.fh3 = 100
+
+    if(w < 800) {
+      txt.fp1 = 72,
+      txt.fp2 = 30,
+      txt.fp3 = 18,
+      txt.fh1 = 175,
+      txt.fh2 = 125,
+      txt.fh3 = 75
+    }
+
     ctx.fillStyle = isShiny() ? 'black' : 'white';
-    ctx.font = '72px monospace';
-    ctx.fillText(asFuncNotation().trim(), w-woffset, h-175);
-    ctx.font = '144px monospace';
-    ctx.fillText(`#${hex}`, w-woffset, h-275);
-    ctx.font = 'bold 36px monospace';
-    ctx.fillText(`motetpaper.github.io/hexrgb`, w-woffset, h-100);
+    ctx.font = `bold ${txt.fp1}px monospace`;
+    ctx.fillText(`#${hex}`, woffset, h-txt.fh1);
+    ctx.font = `${txt.fp2}px monospace`;
+    ctx.fillText(asFuncNotation().trim(), woffset, h-txt.fh2);
+    ctx.font = `bold ${txt.fp3}px monospace`;
+    ctx.fillText(`motetpaper.github.io/hexrgb`, woffset, h-txt.fh3);
   }
   const url = canvas.toDataURL('image/png');
   const a = document.createElement('a');
