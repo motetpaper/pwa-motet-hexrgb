@@ -67,7 +67,7 @@ button {
 }
 
 .popover {
-  z: 100;
+  z-index: 100;
   width: 500px;
   height: 300px;
   font-size: 15pt;
@@ -75,17 +75,30 @@ button {
   border: 200px solid rgba(0,0,0,0.5);
 }
 #settings {
-  z: 100;
+  z-index: 100;
 }
 
 #exporters {
-  z: 99;
+  z-index: 99;
   height: 450px;
 }
 
 
 #colorpanel {
   position: relative;
-  z:88;
+  z-index:88;
   top: -80px;
+}
+
+@media screen and (orientation: portrait) {
+ .popover {
+    width: 200px;
+    font-size: 15pt;
+    padding: 25px;
+    border: 15 solid black;
+  }
+
+  #exporters {
+    height: 500px
+  }
 }

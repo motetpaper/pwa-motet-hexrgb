@@ -23,7 +23,6 @@ const rgb = {
   b: 0,
 }
 
-
 document.addEventListener('DOMContentLoaded', (evt)=>{
   console.log('loaded');
   restoreColors();
@@ -53,6 +52,12 @@ document.addEventListener('DOMContentLoaded', (evt)=>{
     });
   });
 
+  // the built-in (native) web browser color picker
+  // returns the color value as a hexadecimal triplet
+  // this requires us to convert the value to RGB
+
+  // processing built-in color picker values
+
   picker.addEventListener('input', (evt) => {
     setColorFromHexString(evt.target.value);
     console.log(rgb);
@@ -63,17 +68,19 @@ document.addEventListener('DOMContentLoaded', (evt)=>{
     console.log(rgb);
   });
 
-
+  // processing input from text boxes
   boxes.forEach((a)=>{
     // prevents non-number to be entered
     a.addEventListener('input', (evt) => {
       const re = /[^\d]/ig;
-      const rgb_clamped = new Uint8ClampedArray(1);
+
+      // the 'clamp' keeps all the entered number between 0 and 255 (inclusive)
+      const clamed_rgb_value = new Uint8ClampedArray(1);
       const s = evt.target.value.replace(re,'');
-      rgb_clamped[0] = +s; // clamps the value between 0 and 255
-      evt.target.value = rgb_clamped[0];
+      clamed_rgb_value[0] = +s; // clamps the value between 0 and 255
+      evt.target.value = clamed_rgb_value[0];
       const which = evt.target.id.replace('box','');
-      rgb[which] = rgb_clamped[0];
+      rgb[which] = clamed_rgb_value[0];
       console.log(rgb);
       updateBars();
       updatePage();
@@ -89,23 +96,71 @@ document.addEventListener('DOMContentLoaded', (evt)=>{
       updateBoxes();
     });
   });
-
+  bars.filter = Array.prototype.filter;
   bars.forEach((a)=>{
-//    console.log(a.id, a.value);
-
     // updates when the range selection has completed
     a.addEventListener('change', (evt) => {
-//      console.log('change');
-//      console.log(evt.target.id);
-//      console.log(evt.target.value);
+      console.log(evt);
+      evt.target.addEventListener('onmouseup', function(m_evt){
+        if(!!m_evt.ctrlKey && !!m_evt.which) {
+          // the Ctrl + click creates "quick grey mode"
+          // sets the other bars to the exact same color
+            bars.filter((b)=>b.id != m_evt.target.id)
+            .forEach((b)=>b.value = m_evt.target.value);
+          console.log(m_evt.which);
+          console.log(m_evt);
+        }
+      });
+      saveColors();
+    });
+
+    a.addEventListener('click', (evt) => {
+      console.log(evt);
+      evt.target.addEventListener('mousedown', function(m_evt){
+        if(!!m_evt.ctrlKey && !!m_evt.which) {
+          // the Ctrl + click creates "quick grey mode"
+          // sets the other bars to the exact same color
+          val = m_evt.target.value;
+          bars.forEach((b)=> rgb[b.id] = val);
+        }
+      });
+          updateBars();
+      saveColors();
+    });
+
+
+    a.addEventListener('click', (evt) => {
+        if(!!evt.ctrlKey && !!evt.which) {
+          // the Ctrl + click creates "quick grey mode"
+          // sets the other bars to the exact same color
+          val = evt.target.value;
+          bars.forEach((b)=> rgb[b.id] = val);
+        }
+
+      console.log(evt);
+      evt.target.addEventListener('mousemove', function(m_evt){
+        if(!!m_evt.ctrlKey && !!m_evt.which) {
+          // the Ctrl + click creates "quick grey mode"
+          // sets the other bars to the exact same color
+          val = m_evt.target.value;
+          bars.forEach((b)=> rgb[b.id] = val);
+        }
+      });
       saveColors();
     });
 
     // constantly updates while range selection in progress
     a.addEventListener('input', (evt) => {
-//      console.log('input');
-//      console.log(evt.target.id);
-//      console.log(evt.target.value);
+      console.log(evt);
+      evt.target.addEventListener('mouseover', function(m_evt){
+        if(!!m_evt.ctrlKey && !!m_evt.which) {
+          // the Ctrl + click creates "quick grey mode"
+          // sets the other bars to the exact same color
+            [...bars].forEach((b)=>b.value = m_evt.target.value);
+          console.log(m_evt.which);
+          console.log(m_evt);
+        }
+      });
       saveColors();
     });
   });
@@ -119,7 +174,6 @@ function saveColors() {
     rgb[a.id] = a.value;
   });
   update();
-//  console.log(localStorage);
 }
 
 // returns rgb object as a hex string
@@ -162,7 +216,6 @@ function updateBoxes(bg) {
     b.value = rgb[which];
     b.style.backgroundColor = asFuncNotation();
     b.style.color = isShiny() ? 'black' : 'white';
-//    console.log(b);
   });
 
   hexspan.forEach((a)=>{
@@ -181,6 +234,7 @@ function updateBars() {
 
 // updates colors everywhere
 function update() {
+  console.log('fn:update');
   thepage.style.backgroundColor = asFuncNotation();
   updateBars();
   updatePage();

@@ -3,18 +3,19 @@
 // git    : https://github.com/motetpaper/pwa-motet-hexrgb
 // lic    : MIT
 
-
-const cacheName = "hexrgb-v1";
+const cacheName = 'hexrgb-v0-3-1';
 const swfiles = [
-  "/hexrgb/",
-  "/hexrgb/index.html",
-  "/hexrgb/app.js",
-  "/hexrgb/style.css",
-  "/hexrgb/favicon.ico",
-  "/hexrgb/icon/icon512.png"
+  './hexrgb/',
+  './hexrgb/index.html',
+  './hexrgb/app.js',
+  './hexrgb/style.css',
+  './hexrgb/favicon.ico',
+  './hexrgb/icon/icon512.png',
 ];
 
-const contentToCache = swfiles;
+const contentToCache = [];
+contentToCache.concat(swfiles);
+
 self.addEventListener('install', (evt) => {
   console.log('[sw.js] Install');
   evt.waitUntil(
@@ -31,6 +32,7 @@ self.addEventListener('fetch', (evt) => {
     (async () => {
       const r = await caches.match(evt.request);
       console.log(`[sw.js] Fetching resource: ${evt.request.url}`);
+      console.log(evt);
       if (r) {
         return r;
       }
@@ -42,3 +44,5 @@ self.addEventListener('fetch', (evt) => {
     })(),
   );
 });
+
+
