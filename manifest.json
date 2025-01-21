@@ -3,12 +3,12 @@
   "name": "MOTET HEXRGB",
   "icons": [
     {
-      "src": "/icon/icon512.png",
+      "src": "./icon/icon512.png",
       "sizes": "512x512",
       "type": "image/png"
     }
   ],
-  "start_url": ".",
+  "start_url": "./hexrgb",
   "display": "standalone",
   "theme_color": "#0000ff",
   "background_color": "#00ff00"
