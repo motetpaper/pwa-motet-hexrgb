@@ -25,9 +25,7 @@ const picker = document.querySelector('#colorpicker');
 
 const btns = document.querySelectorAll('button');
 
-bars.filter = Array.prototype.filter;
 document.addEventListener('DOMContentLoaded', (evt)=>{
-  console.log('loaded');
   load_from_storage();
 
   // the built-in (native) web browser color picker
@@ -38,13 +36,11 @@ document.addEventListener('DOMContentLoaded', (evt)=>{
 
   picker.addEventListener('input', (evt) => {
     setColorFromHexString(evt.target.value);
-    console.log(hex, rgb);
     upd();
   });
 
   picker.addEventListener('change', (evt) => {
     setColorFromHexString(evt.target.value);
-    console.log(hex, rgb);
     upd();
     save_later();
   });
@@ -56,7 +52,7 @@ document.addEventListener('DOMContentLoaded', (evt)=>{
       const re = /[^\d]/g
       evt.target.value = asColorValue(evt.target.value.replace(re,''));
       rgb[evt.target.id[0]] = evt.target.value;
-      console.log(rgb);
+
       upd();
     });
   });
@@ -67,7 +63,6 @@ document.addEventListener('DOMContentLoaded', (evt)=>{
       evt.target.value = asColorValue(evt.target.value.replace(re,''));
       rgb[evt.target.id[0]] = evt.target.value;
       hex = asHexString();
-      console.log(rgb);
       upd();
       save_later();
     });
@@ -78,7 +73,7 @@ document.addEventListener('DOMContentLoaded', (evt)=>{
   bars.forEach((b)=> {
     b.addEventListener('input', (evt) => {
       rgb[evt.target.id] = evt.target.value;
-      console.log(rgb);
+
       upd();
     });
 
@@ -88,14 +83,13 @@ document.addEventListener('DOMContentLoaded', (evt)=>{
         setGreyColor(m_evt.target.value);
         upd();
       }
-      console.log(rgb);
     });
   });
 
   bars.forEach((b)=> {
     b.addEventListener('change', (evt) => {
       rgb[evt.target.id] = evt.target.value;
-      console.log(rgb);
+
       upd();
       save_later();
     });
@@ -107,7 +101,6 @@ document.addEventListener('DOMContentLoaded', (evt)=>{
         upd();
         save_later();
       }
-      console.log(rgb);
     });
   });
 
@@ -126,7 +119,6 @@ function setGreyColor(str) {
 
 // updates the color picker and hex value display
 function updatePicker() {
-  console.log(hex);
   picker.value = `#${hex}`;
   hexpad.innerText = hex;
   hexspan.forEach((s)=> {
@@ -202,15 +194,12 @@ function setColorFromHexString(str) {
 function load_from_storage() {
   rgb = localStorage['rgb'] ? JSON.parse(localStorage['rgb']) : {r: '128', g: '128', b: '128'};
   hex = asHexString(); // rgb is source of truth
-
-  console.log('loaded', hex,rgb);
 }
 
 // saves the current color to localStorage
 function save_to_storage() {
   localStorage['hex'] = asHexString();
   localStorage['rgb'] = JSON.stringify(rgb)
-  console.log('saved', localStorage);
 }
 
 // slightly delays saving the color to localStorage
@@ -226,7 +215,6 @@ function asColorValue(str) {
 }
 
 function upd() {
-  console.log('fn:upd');
   hex = asHexString();
   updateBoxes();
   updateBars();
