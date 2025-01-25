@@ -200,8 +200,9 @@ function setColorFromHexString(str) {
 
 // loads the current color from localStorage
 function load_from_storage() {
-  hex = localStorage['hex'] || '000000';
-  rgb = JSON.parse(localStorage['rgb']) || {r: '0', g: '0', b: '0'};
+  rgb = localStorage['rgb'] ? JSON.parse(localStorage['rgb']) : {r: '128', g: '128', b: '128'};
+  hex = asHexString(); // rgb is source of truth
+
   console.log('loaded', hex,rgb);
 }
 
