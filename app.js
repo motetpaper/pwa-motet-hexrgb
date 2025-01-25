@@ -7,6 +7,14 @@ if ("serviceWorker" in navigator) {
   navigator.serviceWorker.register('./sw.js');
 }
 
+let rgb = {
+  r: 0,
+  g: 0,
+  b: 0,
+}
+
+let hex = '000000';
+
 const thepage = document.body;
 const wrap = document.querySelector('#wrap');
 const bars = document.querySelectorAll('input[type=range]');
@@ -17,40 +25,10 @@ const picker = document.querySelector('#colorpicker');
 
 const btns = document.querySelectorAll('button');
 
-const rgb = {
-  r: 0,
-  g: 0,
-  b: 0,
-}
-
+bars.filter = Array.prototype.filter;
 document.addEventListener('DOMContentLoaded', (evt)=>{
   console.log('loaded');
-  restoreColors();
-
-  btns.forEach((a) => {
-    a.addEventListener('click', (evt)=>{
-      switch(evt.target.id){
-        case 'export-favicon':
-          motet_export_favicon();
-          break;
-        case 'export-icon':
-          motet_export_png_icon();
-          break;
-        case 'export-photocard':
-          motet_export_photo_4r();
-          break;
-        case 'export-wallpaper-notext':
-          motet_export_desktop_wallpaper();
-          break;
-        case 'export-wallpaper':
-          motet_export_desktop_wallpaper(true);
-          break;
-        default:
-          // nothing
-          break;
-      }
-    });
-  });
+  load_from_storage();
 
   // the built-in (native) web browser color picker
   // returns the color value as a hexadecimal triplet
@@ -60,198 +38,128 @@ document.addEventListener('DOMContentLoaded', (evt)=>{
 
   picker.addEventListener('input', (evt) => {
     setColorFromHexString(evt.target.value);
-    console.log(rgb);
+    console.log(hex, rgb);
+    upd();
   });
 
   picker.addEventListener('change', (evt) => {
     setColorFromHexString(evt.target.value);
-    console.log(rgb);
+    console.log(hex, rgb);
+    upd();
+    save_later();
   });
 
-  // processing input from text boxes
-  boxes.forEach((a)=>{
-    // prevents non-number to be entered
-    a.addEventListener('input', (evt) => {
-      const re = /[^\d]/ig;
-
-      // the 'clamp' keeps all the entered number between 0 and 255 (inclusive)
-      const clamed_rgb_value = new Uint8ClampedArray(1);
-      const s = evt.target.value.replace(re,'');
-      clamed_rgb_value[0] = +s; // clamps the value between 0 and 255
-      evt.target.value = clamed_rgb_value[0];
-      const which = evt.target.id.replace('box','');
-      rgb[which] = clamed_rgb_value[0];
+  // text boxes, expecting number input,
+  // clamps values between 0 and 255
+  boxes.forEach((b)=> {
+    b.addEventListener('input', (evt) => {
+      const re = /[^\d]/g
+      evt.target.value = asColorValue(evt.target.value.replace(re,''));
+      rgb[evt.target.id[0]] = evt.target.value;
       console.log(rgb);
-      updateBars();
-      updatePage();
-      updateBoxes();
+      upd();
     });
+  });
 
-    a.addEventListener('blur', (evt) => {
-      const which = evt.target.id.replace('box','');
-      rgb[which] = evt.target.value;
+  boxes.forEach((b)=> {
+    b.addEventListener('blur', (evt) => {
+      const re = /[^\d]/g
+      evt.target.value = asColorValue(evt.target.value.replace(re,''));
+      rgb[evt.target.id[0]] = evt.target.value;
+      hex = asHexString();
       console.log(rgb);
-      updateBars();
-      updatePage();
-      updateBoxes();
+      upd();
+      save_later();
     });
   });
-  bars.filter = Array.prototype.filter;
-  bars.forEach((a)=>{
-    // updates when the range selection has completed
-    a.addEventListener('change', (evt) => {
-      console.log(evt);
-      evt.target.addEventListener('onmouseup', function(m_evt){
-        if(!!m_evt.ctrlKey && !!m_evt.which) {
-          // the Ctrl + click creates "quick grey mode"
-          // sets the other bars to the exact same color
-            bars.filter((b)=>b.id != m_evt.target.id)
-            .forEach((b)=>b.value = m_evt.target.value);
-          console.log(m_evt.which);
-          console.log(m_evt);
-        }
-      });
-      saveColors();
+
+
+  // RGB sliders between 0 and 255
+  bars.forEach((b)=> {
+    b.addEventListener('input', (evt) => {
+      rgb[evt.target.id] = evt.target.value;
+      console.log(rgb);
+      upd();
     });
 
-    a.addEventListener('click', (evt) => {
-      console.log(evt);
-      evt.target.addEventListener('mousedown', function(m_evt){
-        if(!!m_evt.ctrlKey && !!m_evt.which) {
-          // the Ctrl + click creates "quick grey mode"
-          // sets the other bars to the exact same color
-          val = m_evt.target.value;
-          bars.forEach((b)=> rgb[b.id] = val);
-        }
-      });
-          updateBars();
-      saveColors();
-    });
-
-
-    a.addEventListener('click', (evt) => {
-        if(!!evt.ctrlKey && !!evt.which) {
-          // the Ctrl + click creates "quick grey mode"
-          // sets the other bars to the exact same color
-          val = evt.target.value;
-          bars.forEach((b)=> rgb[b.id] = val);
-        }
-
-      console.log(evt);
-      evt.target.addEventListener('mousemove', function(m_evt){
-        if(!!m_evt.ctrlKey && !!m_evt.which) {
-          // the Ctrl + click creates "quick grey mode"
-          // sets the other bars to the exact same color
-          val = m_evt.target.value;
-          bars.forEach((b)=> rgb[b.id] = val);
-        }
-      });
-      saveColors();
-    });
-
-    // constantly updates while range selection in progress
-    a.addEventListener('input', (evt) => {
-      console.log(evt);
-      evt.target.addEventListener('mouseover', function(m_evt){
-        if(!!m_evt.ctrlKey && !!m_evt.which) {
-          // the Ctrl + click creates "quick grey mode"
-          // sets the other bars to the exact same color
-            [...bars].forEach((b)=>b.value = m_evt.target.value);
-          console.log(m_evt.which);
-          console.log(m_evt);
-        }
-      });
-      saveColors();
+    // ctrl+click grey mode
+    b.addEventListener('mousemove', (m_evt) => {
+      if(!!m_evt.ctrlKey && !!m_evt.which) {
+        setGreyColor(m_evt.target.value);
+        upd();
+      }
+      console.log(rgb);
     });
   });
+
+  bars.forEach((b)=> {
+    b.addEventListener('change', (evt) => {
+      rgb[evt.target.id] = evt.target.value;
+      console.log(rgb);
+      upd();
+      save_later();
+    });
+
+    // ctrl+click grey mode color saved
+    b.addEventListener('mouseup', (m_evt) => {
+      if(!!m_evt.ctrlKey && !!m_evt.which) {
+        setGreyColor(m_evt.target.value);
+        upd();
+        save_later();
+      }
+      console.log(rgb);
+    });
+  });
+
+  // updates based on RGB color
+  upd();
 });
 
-// saves RGB color in persistent local storage
-// saves RGB in memory
-function saveColors() {
-  bars.forEach((a)=>{
-    localStorage[a.id] = a.value;
-    rgb[a.id] = a.value;
-  });
-  update();
+
+//
+//
+// done, below
+
+function setGreyColor(str) {
+  rgb.r = rgb.g = rgb.b = asColorValue(str);
 }
 
-// returns rgb object as a hex string
-function asHexString() {
-  return Object.keys(rgb)
-    // to hex digits
-    .map((a)=>parseInt(rgb[a]).toString(16))
-    // prepend zero on single hex digit
-    .map((a)=>a.padStart(2,'0'))
-    .join('');
+// updates the color picker and hex value display
+function updatePicker() {
+  console.log(hex);
+  picker.value = `#${hex}`;
+  hexpad.innerText = hex;
+  hexspan.forEach((s)=> {
+    s.style.color = isShiny() ? 'black' : 'white';
+  })
 }
 
-
-function setColorFromHexString(str) {
-
-  const re = /[^A-Fa-f0-9]/ig;
-  str = str.replace(re, '');
-
-  rgb.r = parseInt(str.substr(0,2), 16);
-  rgb.g = parseInt(str.substr(2,2), 16);
-  rgb.b = parseInt(str.substr(4,2), 16);
-
-  updateBars();
-  saveColors();
-}
-
-
-// loads color settings
-function restoreColors() {
-  bars.forEach((a)=>{
-    a.value = localStorage[a.id];
-    rgb[a.id] = a.value;
-  });
-  update();
-}
-
-function updateBoxes(bg) {
+// updates the text boxes
+function updateBoxes() {
   boxes.forEach((b)=>{
-    const which = b.id.replace('box','');
-    b.value = rgb[which];
     b.style.backgroundColor = asFuncNotation();
     b.style.color = isShiny() ? 'black' : 'white';
+    const which = b.id.replace('box','');
+    b.value = rgb[which];
   });
-
-  hexspan.forEach((a)=>{
-    a.style.color = isShiny() ? 'black' : 'white';
-  });
-
-  hexpad.innerText = asHexString();
 }
 
+// updates the sliders
 function updateBars() {
   bars.forEach((b)=>{
-    b.value = rgb[b.id];
+    b.style.backgroundColor = asFuncNotation();
     b.style.accentColor = isShiny() ? 'black' : 'white';
+    b.value = rgb[b.id];
   });
 }
 
-// updates colors everywhere
-function update() {
-  console.log('fn:update');
-  thepage.style.backgroundColor = asFuncNotation();
-  updateBars();
-  updatePage();
-  updateBoxes();
-  updatePicker();
-}
-
-function updatePicker() {
-  const hex = asHexString();
-  picker.value = `#${hex}`;
-}
-
+// updates the page background
 function updatePage() {
   thepage.style.backgroundColor = asFuncNotation();
   thepage.style.color = isShiny() ? 'black' : 'white';
 }
 
+// returns the current color in functional notation
 function asFuncNotation() {
   return ` rgb(${rgb.r},${rgb.g},${rgb.b})`;
 }
@@ -268,112 +176,59 @@ function isShiny() {
   return (y > 0.5) ? true : false;
 }
 
-function motet_export_favicon() {
-  const canvas = document.createElement('canvas');
-  canvas.height = 16;
-  canvas.width = 16;
-  const ctx = canvas.getContext('2d');
-  const img = new Image();
-  img.src = 'favicon.ico'
-  img.onload = function() {
-    ctx.drawImage(img, 0, 0);
-    const hex = asHexString();
-    ctx.fillStyle = `#${hex}`;
-    console.log(ctx.fillStyle);
-    ctx.fillRect(0,0,16,16);
-    const url = canvas.toDataURL('image/x-icon');
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'favicon.ico';
-    a.click();
-  };
+// returns rgb object as a hex string
+function asHexString() {
+  return Object.keys(rgb)
+    // to hex digits
+    .map((a)=>parseInt(rgb[a]).toString(16))
+    // prepend zero on single hex digit
+    .map((a)=>a.padStart(2,'0'))
+    .join('');
 }
 
-function motet_export_png_icon() {
-  const size = 1024;
-  const fn = `icon${size}.png`;
-  const canvas = document.createElement('canvas');
-  canvas.width = size;
-  canvas.height = size;
-  const ctx = canvas.getContext('2d');
-  const hex = asHexString();
-  ctx.fillStyle = `#${hex}`;
-  ctx.fillRect(0,0,size,size);
-  const url = canvas.toDataURL('image/png');
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = fn;
-  a.click();
+// sets the color using a hex string, if valid
+function setColorFromHexString(str) {
+  const re = /[^A-Fa-f0-9]/ig;
+  str = str.replace(re, '');
+  rgb.r = parseInt(str.substr(0,2), 16);
+  rgb.g = parseInt(str.substr(2,2), 16);
+  rgb.b = parseInt(str.substr(4,2), 16);
 }
 
 
-function motet_export_photo_4r() {
-  const woffset = 800;
-  const canvas = document.createElement('canvas');
-  canvas.width = w = 3600;
-  canvas.height = h = 2400;
-  const ctx = canvas.getContext('2d');
-  const hex = asHexString();
-  const fn = `photo-4r-${hex}.png`;
-  ctx.fillStyle = `#${hex}`;
-  ctx.fillRect(0,0,w,h);
-  ctx.fillStyle = isShiny() ? 'black' : 'white';
-  ctx.font = '72px monospace';
-  ctx.fillText(asFuncNotation().trim(), w-woffset, h-175);
-  ctx.font = '144px monospace';
-  ctx.fillText(`#${hex}`, w-woffset, h-275);
-  ctx.font = 'bold 36px monospace';
-  ctx.fillText(`motetpaper.github.io/hexrgb`, w-woffset, h-100);
-  const url = canvas.toDataURL('image/png');
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = fn;
-  a.click();
+// save or load settings
+
+// loads the current color from localStorage
+function load_from_storage() {
+  hex = localStorage['hex'];
+  rgb = JSON.parse(localStorage['rgb']);
+  console.log('loaded', hex,rgb);
 }
 
+// saves the current color to localStorage
+function save_to_storage() {
+  localStorage['hex'] = asHexString();
+  localStorage['rgb'] = JSON.stringify(rgb);
+  console.log('saved', localStorage);
+}
 
-function motet_export_desktop_wallpaper(showText) {
-  const canvas = document.createElement('canvas');
-  canvas.width = w = window.screen.width;
-  canvas.height = h = window.screen.height;
+// slightly delays saving the color to localStorage
+function save_later() {
+  setTimeout(save_to_storage, 1000);
+}
 
-  const woffset = Math.floor(0.1 * w);
-  const ctx = canvas.getContext('2d');
-  const hex = asHexString();
-  const fn = `desktop-wallpaper-${hex}.png`;
-  ctx.fillStyle = `#${hex}`;
-  ctx.fillRect(0,0,w,h);
+// clamps color to values between 0 and 255
+function asColorValue(str) {
+  const clamped_rgb_value = new Uint8ClampedArray(1);
+  clamped_rgb_value[0] = +str; // cast to unsigned int
+  return '' + clamped_rgb_value[0]; // cast back to string
+}
 
-  txt = {};
-  if(showText) {
-
-    txt.fp1 = 144,
-    txt.fp2 = 72,
-    txt.fp3 = 36,
-    txt.fh1 = 275,
-    txt.fh2 = 175,
-    txt.fh3 = 100
-
-    if(w < 800) {
-      txt.fp1 = 72,
-      txt.fp2 = 30,
-      txt.fp3 = 18,
-      txt.fh1 = 175,
-      txt.fh2 = 125,
-      txt.fh3 = 75
-    }
-
-    ctx.fillStyle = isShiny() ? 'black' : 'white';
-    ctx.font = `bold ${txt.fp1}px monospace`;
-    ctx.fillText(`#${hex}`, woffset, h-txt.fh1);
-    ctx.font = `${txt.fp2}px monospace`;
-    ctx.fillText(asFuncNotation().trim(), woffset, h-txt.fh2);
-    ctx.font = `bold ${txt.fp3}px monospace`;
-    ctx.fillText(`motetpaper.github.io/hexrgb`, woffset, h-txt.fh3);
-  }
-  const url = canvas.toDataURL('image/png');
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = fn;
-  a.click();
+function upd() {
+  console.log('fn:upd');
+  hex = asHexString();
+  updateBoxes();
+  updateBars();
+  updatePage();
+  updatePicker();
 }
