@@ -3,7 +3,7 @@
 // git    : https://github.com/motetpaper/pwa-motet-hexrgb
 // lic    : MIT
 
-const cacheName = 'hexrgb-v0-3-1';
+const cacheName = 'hexrgb-v0-5-1';
 const swfiles = [
   './hexrgb/',
   './hexrgb/index.html',
@@ -44,5 +44,3 @@ self.addEventListener('fetch', (evt) => {
     })(),
   );
 });
-
-
