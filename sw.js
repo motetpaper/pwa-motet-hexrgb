@@ -3,14 +3,14 @@
 // git    : https://github.com/motetpaper/pwa-motet-hexrgb
 // lic    : MIT
 
-const cacheName = 'hexrgb-v0-5-2';
+const cacheName = 'hexrgb-v0-5-3';
 const swfiles = [
-  './hexrgb/',
-  './hexrgb/index.html',
-  './hexrgb/app.js',
-  './hexrgb/style.css',
-  './hexrgb/favicon.ico',
-  './hexrgb/icon/icon512.png',
+  './',
+  './index.html',
+  './app.js',
+  './style.css',
+  './favicon.ico',
+  './icon/icon512.png',
 ];
 
 const contentToCache = [];
@@ -43,4 +43,3 @@ self.addEventListener('fetch', (evt) => {
       return response;
     })(),
   );
-});
