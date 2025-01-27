@@ -15,18 +15,38 @@ let rgb = {
 
 let hex = '000000';
 
+let isAltKeyDown = false;
+let isCtrlKeyDown = false;
+
 const thepage = document.body;
 const wrap = document.querySelector('#wrap');
-const bars = document.querySelectorAll('input[type=range]');
-const boxes = document.querySelectorAll('input[type=text]');
 const hexpad = document.querySelector('#hexpad');
-const hexspan = document.querySelectorAll('#hexwrap span');
 const picker = document.querySelector('#colorpicker');
 
+const bars = document.querySelectorAll('input[type=range]');
+const boxes = document.querySelectorAll('input[type=text]');
+const hexspan = document.querySelectorAll('#hexwrap span');
 const btns = document.querySelectorAll('button');
 
 document.addEventListener('DOMContentLoaded', (evt)=>{
   load_from_storage();
+
+  // keyboard modes
+  // the alt key enables parade mode
+  // the ctrl key enables grey mode
+
+  // NOTE: no decision yet about touch events
+
+  thepage.addEventListener('keydown', (k_evt) => {
+    isAltKeyDown = !!k_evt.altKey;
+    isCtrlKeyDown = !!k_evt.ctrlKey;
+  });
+
+  thepage.addEventListener('keyup', (k_evt) => {
+    isAltKeyDown = !!k_evt.altKey;
+    isCtrlKeyDown = !!k_evt.ctrlKey;
+  });
+
 
   // the built-in (native) web browser color picker
   // returns the color value as a hexadecimal triplet
@@ -52,7 +72,6 @@ document.addEventListener('DOMContentLoaded', (evt)=>{
       const re = /[^\d]/g
       evt.target.value = asColorValue(evt.target.value.replace(re,''));
       rgb[evt.target.id[0]] = evt.target.value;
-
       upd();
     });
   });
@@ -72,35 +91,37 @@ document.addEventListener('DOMContentLoaded', (evt)=>{
   // RGB sliders between 0 and 255
   bars.forEach((b)=> {
     b.addEventListener('input', (evt) => {
-      rgb[evt.target.id] = evt.target.value;
 
-      upd();
-    });
+      // alt-click enables parade mode
+      if(isAltKeyDown) {
+        let diffValue = +evt.target.value - rgb[evt.target.id];
 
-    // ctrl+click grey mode
-    b.addEventListener('mousemove', (m_evt) => {
-      if(!!m_evt.ctrlKey && !!m_evt.which) {
-        setGreyColor(m_evt.target.value);
-        upd();
+        // this is the "other bars idiom" instead of filter NodeLists
+        'rgb'.split('')
+          .filter((id)=>id!=evt.target.id)
+          .forEach((id)=>{
+            rgb[id] = asColorValue(+rgb[id] + diffValue);
+          });
+
+      // ctrl-click enables grey mode
+      } else if (isCtrlKeyDown) {
+        'rgb'.split('')
+          .filter((id)=>id!=evt.target.id)
+          .forEach((id)=>{
+            rgb[id] = asColorValue(evt.target.value);
+          });
       }
+
+      rgb[evt.target.id] = evt.target.value;
+      upd();
     });
   });
 
   bars.forEach((b)=> {
     b.addEventListener('change', (evt) => {
       rgb[evt.target.id] = evt.target.value;
-
       upd();
       save_later();
-    });
-
-    // ctrl+click grey mode color saved
-    b.addEventListener('mouseup', (m_evt) => {
-      if(!!m_evt.ctrlKey && !!m_evt.which) {
-        setGreyColor(m_evt.target.value);
-        upd();
-        save_later();
-      }
     });
   });
 
