@@ -67,12 +67,15 @@ button {
 }
 
 .popover {
-  z-index: 100;
-  width: 500px;
+  z-index: 99;
+  width: 85%;
   height: 300px;
   font-size: 15pt;
   padding: 25px;
-  border: 200px solid rgba(0,0,0,0.5);
+  border: 5px solid black;
+
+  /**not sure about this yet**/
+  /**border: 200px solid rgba(0,0,0,0.5); **/
 }
 #settings {
   z-index: 100;
